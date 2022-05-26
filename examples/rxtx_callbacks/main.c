@@ -41,17 +41,17 @@
 //                         hwts_dynfield_offset, rte_mbuf_timestamp_t *);
 // }
 
-// typedef uint64_t tsc_t;
-// static int tsc_dynfield_offset = -1;
+typedef uint64_t tsc_t;
+static int tsc_dynfield_offset = -1;
 
-// static inline tsc_t *
-// tsc_field(struct rte_mbuf *mbuf)
-// {
-//         return RTE_MBUF_DYNFIELD(mbuf, tsc_dynfield_offset, tsc_t *);
-// }
+static inline tsc_t *
+tsc_field(struct rte_mbuf *mbuf)
+{
+        return RTE_MBUF_DYNFIELD(mbuf, tsc_dynfield_offset, tsc_t *);
+}
 
-// static const char usage[] =
-//         "%s EAL_ARGS -- [-t]\n";
+static const char usage[] =
+        "%s EAL_ARGS -- [-t]\n";
 
 static const struct rte_bpf_xsym bpf_xsym[] = {
         {
@@ -270,7 +270,7 @@ pkt_jit(const struct rte_bpf_jit *jit, struct rte_mbuf *mb[],
     for(i = 0; i != num; i++){
         dp = rte_pktmbuf_mtod(mb[i], void *);
         hash_mbuf->mbuf = dp;
-        hash_mbuf->hash_key = NULL;
+        hash_mbuf->hash_key = "";
         rc[i] = jit->func(hash_mbuf);
         n += (rc[i] == 0);
     }
@@ -457,11 +457,11 @@ static void bpf_callback_rx(const char *fname, uint16_t port, uint16_t queue, co
 
         arg.type = RTE_BPF_ARG_PTR; // pointer to data buffer
         arg.size = sizeof(struct hash_mbuf);
-        arg.buf_size = RTE_MBUF_DEFAULT_BUF_SIZE; // 每个mbuf的数据缓冲区的大小
+        // arg.buf_size = RTE_MBUF_DEFAULT_BUF_SIZE; // 每个mbuf的数据缓冲区的大小
 
         memset(&prm, 0, sizeof(prm));
-        prm.xsym = bpf_xsym;
-        prm.nb_xsym = RTE_DIM(bpf_xsym);
+        // prm.xsym = bpf_xsym;
+        // prm.nb_xsym = RTE_DIM(bpf_xsym);
         prm.prog_arg = arg;
 
         //printf(">>>>>>>>>");
@@ -545,6 +545,7 @@ ebpf_callback(uint16_t port __rte_unused, uint16_t qidx __rte_unused,
         unsigned i;
         //uint64_t now = rte_rdtsc();
         // nb_pkts
+		
         for (i = 0; i < nb_pkts; i++){
                 entry(pkts[i]);
         }
