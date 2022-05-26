@@ -98,6 +98,7 @@ HASHMBUF *hash_mbuf = NULL;
  * Even number means that callback is not used by datapath.
  */
 #define BPF_ETH_CBI_INUSE  1
+#define __rte_noreturn __attribute__((noreturn))
 /*
  * information about installed BPF rx/tx callback
  */
@@ -369,6 +370,7 @@ bpf_eth_elf_load_test(struct bpf_eth_cbh *cbh, uint16_t port, uint16_t queue,
     
     cbh->type = BPF_ETH_RX;
     frx = select_rx_callback(prm->prog_arg.type, flags);
+	//frx = (rte_rx_callback_fn)bpf_rx_callback_jit_test;
 
 	if (frx == NULL) {
 		RTE_BPF_LOG(ERR, "%s(%u, %u): no callback selected;\n",
@@ -671,7 +673,7 @@ port_init(uint16_t port, struct rte_mempool *mbuf_pool)
         //         return retval;
 
         // fname, port, queue, sname
-        bpf_callback_rx("/home/dpdk-stable-19.11.12/examples/bpf/t3.o", port, 0, ".text");
+        bpf_callback_rx("/home/dpdk-stable-19.11.12/examples/bpf/t5.o", port, 0, ".text");
         
 
         /* RX and TX callbacks are added to the ports. 
