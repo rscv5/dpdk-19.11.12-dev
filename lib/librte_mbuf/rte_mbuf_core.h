@@ -680,6 +680,15 @@ struct rte_mbuf {
 	uint64_t dynfield1[2]; /**< Reserved for dynamic fields. */
 } __rte_cache_aligned;
 
+////////////////////////////////////////////////////////////
+/* Definition for external hash_mbuf in the BPF program*/
+typedef struct hash_mbuf{
+	char *hash_key; // hash_key
+	struct rte_mbuf *mbuf;
+}HASHMBUF;
+extern HASHMBUF *hash_mbuf;
+/////////////////////////////////////////////////////////////
+
 /**
  * Function typedef of callback to free externally attached buffer.
  */
