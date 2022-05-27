@@ -91,7 +91,7 @@ static const struct rte_bpf_xsym bpf_xsym[] = {
 };
 ///////////////////////////////////////////////////////////////////////////////////
 // 1. init struct rte_bpf_ethdev.h
-HASHMBUF *hash_mbuf = NULL;
+HASHMBUF hash_mbuf;
 
 /*
  * Odd number means that callback is used by datapath.
@@ -269,9 +269,9 @@ pkt_jit(const struct rte_bpf_jit *jit, struct rte_mbuf *mb[],
     // 遍历
     for(i = 0; i != num; i++){
         dp = rte_pktmbuf_mtod(mb[i], void *);
-        hash_mbuf->mbuf = dp;
-        hash_mbuf->hash_key = "";
-        rc[i] = jit->func(hash_mbuf);
+        hash_mbuf.mbuf = dp;
+        // hash_mbuf->hash_key = "";
+        rc[i] = jit->func(&hash_mbuf);
         n += (rc[i] == 0);
     }
 
@@ -377,13 +377,6 @@ bpf_eth_elf_load_test(struct bpf_eth_cbh *cbh, uint16_t port, uint16_t queue,
 			__func__, port, queue);
 		return -EINVAL;
 	}
-
-    bpf = rte_bpf_elf_load(prm, fname, sname);
-    if(frx == NULL){
-        RTE_BPF_LOG(ERR, "%s(%u, %u): no callback selected;\n",
-        __func__, port, queue);
-        return -EINVAL;
-    }
 
     bpf = rte_bpf_elf_load(prm, fname, sname);
     if(bpf == NULL)
